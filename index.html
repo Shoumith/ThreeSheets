@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--<link rel="icon" href="../../favicon.ico">-->
+	<link href="sheets.css" rel="stylesheet">
+	<link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="geosearch.css" />
+		
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script> <!-- JQuery -->
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="Leaflet.MakiMarkers.js"></script> <!-- Markers for Leaflet. -->
+	<script src="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet/1.0.0-rc.4/esri-leaflet.js"></script> <!-- ESRI Basemaps -->
+	
+	<script src="js/geosearch.js"></script> <!-- Search Bar -->
+	<script src="js/osmsearch.js"></script>
+	
+	<script src="leaflet.geocsv.js"></script>
+	<script src="leaflet.geocsv-src.js"></script>
+	
+	<title>Three Sheets to GIS</title>
+  </head>
+    
+  <body>
+    <div class="content">
+		<div id="title">Three Sheets to GIS</div>
+		<div id="intro"> <br /><i>Welcome. This site was created to help past, current and future fans of the show THREE SHEETS. <br /> Find specific episodes based on your favorite destination and enjoy, Cheers!</i></div>
+    </div>
+   
+	<div id="mainpage">
+				
+		<div id="regions" list-style-type="none">
+			<ul>
+			  <li><div id="africa" class="pointer">Africa</li>
+			  <li><div id="asia" class="pointer">Asia</li>
+			  <li><div id="europe" class="pointer"> Europe </div></li>
+			  <li><div id="namerica" class="pointer">North America</li>
+			  <li><div id="oceania2" class="pointer">Oceania East</li>
+			  <li><div id="oceania1" class="pointer">Oceania West</li>
+			  <li><div id="samerica" class="pointer">South America</li>
+			</ul>
+		</div>
+		
+		<div id="mapcontainer">
+			<div id="map"> 
+			<!-- <div id="mapblock"></div> -->
+			</div>
+		</div>
+
+		<script>
+			console.log("Loaded script");
+			masterCoorAttr = []; // creating new array for adding all the attributes.
+				
+			// setting panning extent for each region
+			
+				$(document).ready(function() {
+				$("#europe").on('click', function(){
+				map.panTo(new L.LatLng(49, 21));
+				map.setZoom(3);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+				
+				$("#asia").on('click', function(){
+				map.panTo(new L.LatLng(24.5, 128));
+				map.setZoom(4);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+				
+				$("#namerica").on('click', function(){
+				map.panTo(new L.LatLng(42.5, -105));
+				map.setZoom(3);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+				
+				$("#samerica").on('click', function(){
+				map.panTo(new L.LatLng(-10, -87));
+				map.setZoom(3);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+				
+				$("#africa").on('click', function(){
+				map.panTo(new L.LatLng(-23, 24));
+				map.setZoom(4);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+				
+				$("#oceania1").on('click', function(){
+				map.panTo(new L.LatLng(4, -162));
+				map.setZoom(3);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				}); 
+				
+				$("#oceania2").on('click', function(){
+				map.panTo(new L.LatLng(-40, 174));
+				map.setZoom(4);
+				console.log("click");
+				L.Util.requestAnimFrame(map.invalidateSize, map, false, map._container);
+				});
+			});
+			
+			// adding Streets layer from mapbox											
+			var streets = L.tileLayer('http://{s}.tiles.mapbox.com/v3/jtreinke.k5k39i3m/{z}/{x}/{y}.png', {
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
+				maxZoom: 18
+				}),
+			
+			// adding Basemaps from ESRI
+			    satellite = L.esri.basemapLayer("Imagery")
+				grayscale = L.esri.basemapLayer("Gray")
+				// topographic = L.esri.basemapLayer("Topographic")
+				
+			// adding WMS layer
+											
+			var wms = L.tileLayer.wms("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
+				layers: 'nexrad-n0r-900913',
+				format: 'image/png',
+				transparent: true,
+				attribution: "Weather data © 2012 IEM Nexrad"
+				});
+			
+			var map = L.map('map', {
+				center: [25, 0],
+				zoom: 2,
+				layers: [grayscale]
+				});
+							
+			var baseMaps = {
+				"Satellite Imagery": satellite,
+				"Streets": streets,
+				"GrayScale": grayscale
+				// "Topographic": topographic,
+				};
+			
+			var overlays = {
+				"Weather": wms
+				};
+			
+			L.control.layers(baseMaps, overlays).addTo(map);
+			
+			new L.Control.GeoSearch({
+            provider: new L.GeoSearch.Provider.OpenStreetMap()
+			}).addTo(map);
+				
+			// adding custom icon as Marker			
+			var beerIcon = L.icon({
+				iconUrl: 'beer.png',
+				iconSize:     [25, 25], // size of the icon
+				iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+				popupAnchor:  [10, -5] // point from which the popup should open relative to the iconAnchor
+			});
+			
+			// Reading CSV file with all the attributes data for the pop up
+			$.get('test3.csv', function(csvContents) {
+			    geoLayer = L.geoCsv(csvContents, {
+				firstLineTitles: true, 
+				fieldSeparator: ';',
+				onEachFeature: function (feature, layer) {
+				
+					  var x = feature["geometry"]["coordinates"][1]; // reading X coordinates
+					  var y = feature["geometry"]["coordinates"][0]; // reading Y coordinates
+					  title = feature.properties['title'] 
+					  country =feature.properties['country']
+					  season =feature.properties['season']
+					  episode =feature.properties['episode']
+					  airdate =feature.properties['airdate']
+					  link = feature.properties['link']
+					  linkified = "<a href=" + feature.properties['link'] + "/>" + feature.properties['link'] + "</a>"; // creating href links
+					  desc = feature.properties['description']
+					  
+					  var attributes = [x,y, title, country, season, episode, airdate, linkified, desc]; // order within the master Array
+					  
+					  masterCoorAttr.push(attributes);
+					  
+					  }
+				});
+				
+				for (i = 0; i < masterCoorAttr.length; i++){
+					// console.log(masterCoorAttr[i]);
+					marker = L.marker([masterCoorAttr[i][0],masterCoorAttr[i][1]], {icon: beerIcon}).addTo(map); // reading each pair of coordinates
+					  
+					var popup = '';	// creating popups
+                    var desc = masterCoorAttr[i][8];
+					var cleanDesc = desc.replace("'", "&rsquo;");
+					cleanDesc = cleanDesc.replace("!", "&#33;");
+					popup += '<b><u>'+masterCoorAttr[i][2]+'</u></b>'+'<br />' +'<br />' + "Country: " +masterCoorAttr[i][3] + '<br />' + "Season: " +masterCoorAttr[i][4] +'<br />' + "Episode: " +masterCoorAttr[i][5] +'<br />'+ "Air Date: " +masterCoorAttr[i][6]+'<br />' + "Link: " +masterCoorAttr[i][7] +'<br />' + "Description: " + cleanDesc;
+					//+masterCoorAttr[i][8];
+					
+					marker.bindPopup(popup);
+				    };
+			});
+			
+		</script>
+    </div>
+	
+<br>
+<hr>
+<br>
+		
+	<div id="links" align="center">
+		<div class="homestyle1">
+		<div class="homestyle" style="align:center"><a href="index.html">Home</a></div>
+		<div class="homestyle" style="align:center"><a href="about.html">About</a></div>
+		<div class="homestyle" style="align:center"><a href="metadata.html">Metadata</a></div>
+		</div>
+	</div> 
+
+<br>	
+<hr>
+
+</body>
+
+<footer>
+    <div class="footer">
+      Copyright 2014 by Shoumith Jeyakumar, Jennifer Reinke, Andrew Reicks, Jason Dally - University of Minnesota, Twin Cities. 
+    </div>
+</footer>
+
+</html>
